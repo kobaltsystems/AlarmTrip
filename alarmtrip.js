@@ -1,5 +1,5 @@
 var five = require('johnny-five'),
-  board, button
+  board, button, toggle
 
 var Raspi = require('raspi-io')
 var board = new five.Board({
@@ -30,42 +30,59 @@ device.on('command', function(command) {
 })
 
 board.on('ready', function() {
+	
 	// Test button, used to make sure all notification are working as expected
-  // Create a new `button` hardware instance. This example allows the button module to create a completely default instance
+	// Create a new `button` hardware instance. This example allows the button module to create a completely default instance
   button = new five.Button({
    pin: 'GPIO27',
    isPullup: true
   })
-
+  
   // switch object for dry contact terminals
-  DryContact = new five.Switch({
+  toggle = new five.Switch({
    pin: 'GPIO19',
    isPullup: true
   })
-
-  // Inject the `button` hardware into the Repl instance's context allows direct command line access
-  board.repl.inject({
-    button: button
-	//DryContact: DryContact
-  })
-
+  
+  // Inject the `switch` hardware into
+  // the Repl instance's context;
+  // allows direct command line access
+    board.repl.inject({
+    toggle: toggle
+	//button: button
+  });
+  
+  
+  
   // 'down' the test button is pressed
   button.on('down', function() {
     console.log('Test Button pressed')
     device.sendState({ button: true })
   })
+ 
 
- // Dry contact switch states
-  
-    DryContact.on("open", function() {
-    console.log('dry contact gooooood')
-    device.sendState({ DryContact: false })
+function wait(ms){
+   var start = new Date().getTime();
+   var end = start;
+   while(end < start + ms) {
+     end = new Date().getTime();
+  }
+}
+ 
+  // Dry contact switch states
+ 
+    toggle.on("open", function() {
+//		isAlarm = true;
+	wait(5000);
+	console.log('dry contact good')
+	device.sendState({ DryContact: false })
+		
   });
+    toggle.on("close", function() {
+	wait(5000);
+	console.log('dry contact bad')
+	device.sendState({ DryContact: true })
   
-    DryContact.on("close", function() {
-      console.log('dry contact baaad')
-    device.sendState({ DryContact: true })
-  });
+	});
   
-  
-})
+ })
