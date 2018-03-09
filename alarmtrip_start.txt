@@ -5,10 +5,10 @@ export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
 
 case "$1" in
 start)
-exec forever --sourceDir=/home/pi/alarmtrip -p /home/pi/alarmtrip alarmtrip.js  #scriptarguments
+exec forever start /home/pi/alarmtrip/alarmtrip.js
 ;;
 stop)
-exec forever stop --sourceDir=/home/pi/alarmtrip alarmtrip.js
+exec forever stop /home/pi/alarmtrip/alarmtrip.js
 ;;
 *)
 echo "Usage: /etc/init.d/alarmtrip {start|stop}"
